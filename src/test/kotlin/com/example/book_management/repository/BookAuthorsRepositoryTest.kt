@@ -1,6 +1,5 @@
 package com.example.book_management.repository
 
-import jooq.Tables.BOOKS
 import jooq.Tables.BOOK_AUTHORS
 import org.jooq.DSLContext
 import org.junit.jupiter.api.Assertions.assertEquals
