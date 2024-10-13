@@ -1,15 +1,7 @@
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/book
-#    url: jdbc:postgresql://localhost:5432/book?user=user&password=password
     username: user
     password: password
   main:
     web-application-type: servlet
-
-#spring:
-#  datasource:
-#    driver-class-name: org.postgresql.Driver
-#    url: jdbc:postgresql://localhost:5432/hotel
-#    username: postgres
-#    password: postgres

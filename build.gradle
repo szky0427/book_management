@@ -39,8 +39,6 @@ dependencies {
 	jooqCodegen 'org.postgresql:postgresql:42.7.4'
 	testImplementation 'org.mockito:mockito-core'
 	testImplementation 'org.mockito.kotlin:mockito-kotlin:4.0.0'
-//	testImplementation 'com.h2database:h2'
-
 }
 
 kotlin {
