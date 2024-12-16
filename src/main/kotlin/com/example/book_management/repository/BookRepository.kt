@@ -5,6 +5,7 @@ import com.example.book_management.dto.response.BookResponseDto
 import com.example.book_management.status.PublishStatus
 import jooq.Tables.*
 import org.jooq.DSLContext
+import org.jooq.impl.DSL.trueCondition
 import org.springframework.stereotype.Repository
 
 
@@ -14,11 +15,16 @@ import org.springframework.stereotype.Repository
 @Repository
 class BookRepository(private val create: DSLContext) {
   /**
-   * 著者IDに紐づく書籍情報を取得するメソッド
+   * 検索条件に応じた書籍情報を取得するメソッド
    */
-  fun findBooksByAuthorId(authorId: Int): List<BookResponseDto> {
-    // 書籍IDをキーとし、書籍IDに紐づく複数の書籍情報（著者情報込み）をMap型で取得する。
-    val result = create
+  fun findBooks(title: String?, bookId: Int?, authorName: String?): List<BookResponseDto> {
+    val subquery = create
+      .select(BOOK_AUTHORS.BOOK_ID)
+      .from(BOOK_AUTHORS)
+      .join(AUTHORS).on(AUTHORS.ID.eq(BOOK_AUTHORS.AUTHOR_ID))
+      .where(authorName?.let { AUTHORS.NAME.likeIgnoreCase("%$it%") } ?: trueCondition())
+
+    val query = create
       .select(
         BOOKS.ID, BOOKS.TITLE, BOOKS.PRICE, BOOKS.PUBLISH_STATUS,
         AUTHORS.ID, AUTHORS.NAME, AUTHORS.BIRTH_DATE
@@ -27,14 +33,13 @@ class BookRepository(private val create: DSLContext) {
       .join(BOOK_AUTHORS).on(BOOKS.ID.eq(BOOK_AUTHORS.BOOK_ID))
       .join(AUTHORS).on(AUTHORS.ID.eq(BOOK_AUTHORS.AUTHOR_ID))
       .where(
-        BOOKS.ID.`in`(
-          create.select(BOOKS.ID)
-            .from(BOOKS)
-            .join(BOOK_AUTHORS).on(BOOKS.ID.eq(BOOK_AUTHORS.BOOK_ID))
-            .where(BOOK_AUTHORS.AUTHOR_ID.eq(authorId))
-        )
+        BOOKS.ID.`in`(subquery) // サブクエリで対象の書籍IDを特定
+          .and(title?.let { BOOKS.TITLE.likeIgnoreCase("%$it%") } ?: trueCondition())
+          .and(bookId?.let { BOOKS.ID.eq(it) } ?: trueCondition())
       )
-      .orderBy(BOOKS.ID)
+
+    // 書籍IDに紐づく複数の書籍情報（著者情報込み）を書籍IDをキーとしたMap型で取得する。
+    val result = query.orderBy(BOOKS.ID)
       .fetchGroups(BOOKS.ID)
 
     // 取得件数0の時、空のListを返却する

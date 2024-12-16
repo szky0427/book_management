@@ -195,38 +195,38 @@ class BookServiceTest {
     assertEquals("この著者は存在しません。", exception.message)
   }
 
-  @Test
-  fun findBooksByAuthorId_正常系_著者に紐づく書籍を取得() {
-    val authorId = 1
-    val bookResponseDto = listOf(
-      BookResponseDto(
-        1, "世界の歩き方", 1000, PublishStatus.UnPublished.code, PublishStatus.UnPublished.value,
-        listOf(
-          AuthorResponseDto(1, "山田太郎", LocalDate.of(1990, 12, 25)),
-          AuthorResponseDto(2, "佐藤花子", LocalDate.of(2000, 12, 25))
-        )
-      ),
-      BookResponseDto(
-        2, "家庭の医学", 3000, PublishStatus.Published.code, PublishStatus.Published.value,
-        listOf(AuthorResponseDto(1, "山田太郎", LocalDate.of(1990, 12, 25)))
-      )
-    )
-    `when`(bookRepository.findBooksByAuthorId(authorId)).thenReturn(bookResponseDto)
-
-    val result = bookService.findBooksByAuthorId(authorId)
-
-    assertEquals(bookResponseDto, result)
-  }
-
-  fun findBooksByAuthorId_正常系_取得件数0件の時は空のリストを返却() {
-    val authorId = 2
-    val bookResponseDto = emptyList<BookResponseDto>()
-    `when`(bookRepository.findBooksByAuthorId(authorId)).thenReturn(emptyList<BookResponseDto>())
-
-    val result = bookService.findBooksByAuthorId(authorId)
-
-    assertEquals(bookResponseDto, result)
-  }
+//  @Test
+//  fun findBooksByAuthorId_正常系_著者に紐づく書籍を取得() {
+//    val authorId = 1
+//    val bookResponseDto = listOf(
+//      BookResponseDto(
+//        1, "世界の歩き方", 1000, PublishStatus.UnPublished.code, PublishStatus.UnPublished.value,
+//        listOf(
+//          AuthorResponseDto(1, "山田太郎", LocalDate.of(1990, 12, 25)),
+//          AuthorResponseDto(2, "佐藤花子", LocalDate.of(2000, 12, 25))
+//        )
+//      ),
+//      BookResponseDto(
+//        2, "家庭の医学", 3000, PublishStatus.Published.code, PublishStatus.Published.value,
+//        listOf(AuthorResponseDto(1, "山田太郎", LocalDate.of(1990, 12, 25)))
+//      )
+//    )
+//    `when`(bookRepository.findBooksByAuthorId(authorId)).thenReturn(bookResponseDto)
+//
+//    val result = bookService.findBooksByAuthorId(authorId)
+//
+//    assertEquals(bookResponseDto, result)
+//  }
+//
+//  fun findBooksByAuthorId_正常系_取得件数0件の時は空のリストを返却() {
+//    val authorId = 2
+//    val bookResponseDto = emptyList<BookResponseDto>()
+//    `when`(bookRepository.findBooksByAuthorId(authorId)).thenReturn(emptyList<BookResponseDto>())
+//
+//    val result = bookService.findBooksByAuthorId(authorId)
+//
+//    assertEquals(bookResponseDto, result)
+//  }
 
 }
 

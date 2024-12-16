@@ -63,7 +63,7 @@ class BookService(
   /**
    * 著者IDに紐づく書籍情報を取得する
    */
-  fun findBooksByAuthorId(authorId: Int): List<BookResponseDto> {
-    return bookRepository.findBooksByAuthorId(authorId)
+  fun findBooks(title: String?, bookId: Int?, authorName: String?): List<BookResponseDto> {
+    return bookRepository.findBooks(title, bookId, authorName)
   }
 }
