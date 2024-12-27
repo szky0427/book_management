@@ -1,5 +1,6 @@
 package com.example.book_management.repository
 
+import com.example.book_management.dto.response.AuthorResponseDto
 import jooq.Tables.AUTHORS
 import org.jooq.DSLContext
 import org.springframework.stereotype.Repository
@@ -22,7 +23,7 @@ class AuthorRepository(private val create: DSLContext) {
   }
 
   /**
-   著者の情報を更新するメソッド
+  著者の情報を更新するメソッド
    */
   fun updateAuthor(authorId: Int, name: String, birthDate: LocalDate) {
     create.update(AUTHORS)
@@ -39,5 +40,26 @@ class AuthorRepository(private val create: DSLContext) {
     return create.fetchCount(
       create.selectFrom(AUTHORS).where(AUTHORS.ID.eq(authorId))
     ) > 0
+  }
+
+  /**
+   * 著者を全件取得するメソッド
+   */
+  fun selectAll(): List<AuthorResponseDto> {
+    val result = create.select(
+      AUTHORS.ID,
+      AUTHORS.NAME,
+      AUTHORS.BIRTH_DATE
+    )
+      .from(AUTHORS)
+      .fetch()
+
+    return result.map { record ->
+      AuthorResponseDto(
+        id = record.get(AUTHORS.ID),
+        name = record.get(AUTHORS.NAME),
+        birthDate = record.get(AUTHORS.BIRTH_DATE)
+      )
+    }
   }
 }

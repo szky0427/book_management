@@ -41,13 +41,23 @@ class BookController(private val bookService: BookService) {
   }
 
   /**
-   * 著者に紐づく書籍を取得するAPI
+   * 検索条件に合う書籍を取得するAPI
    */
   @GetMapping("/")
-  fun findBooks(@RequestParam("title") title: String?,
-                          @RequestParam("bookId") bookId: Int?,
-                          @RequestParam("authorName") authorName: String?): ResponseEntity<List<BookResponseDto>> {
+  fun findBooks(
+    @RequestParam("title") title: String?,
+    @RequestParam("bookId") bookId: Int?,
+    @RequestParam("authorName") authorName: String?
+  ): ResponseEntity<List<BookResponseDto>> {
     return ResponseEntity.ok(bookService.findBooks(title, bookId, authorName))
 
+  }
+
+  /**
+   * 書籍IDに紐づく書籍を取得するAPI
+   */
+  @GetMapping("/{bookId}")
+  fun findBooks(@PathVariable bookId: Int): ResponseEntity<BookResponseDto> {
+    return ResponseEntity.ok(bookService.findBookByBookId(bookId))
   }
 }

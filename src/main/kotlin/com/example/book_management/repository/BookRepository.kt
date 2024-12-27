@@ -70,6 +70,43 @@ class BookRepository(private val create: DSLContext) {
   }
 
   /**
+   * 書籍IDに紐づく書籍情報を取得するメソッド
+   */
+  fun findBookById(bookId: Int): BookResponseDto {
+    val result = create
+      .select(
+        BOOKS.ID, BOOKS.TITLE, BOOKS.PRICE, BOOKS.PUBLISH_STATUS,
+        AUTHORS.ID, AUTHORS.NAME, AUTHORS.BIRTH_DATE
+      )
+      .from(BOOKS)
+      .join(BOOK_AUTHORS).on(BOOKS.ID.eq(BOOK_AUTHORS.BOOK_ID))
+      .join(AUTHORS).on(AUTHORS.ID.eq(BOOK_AUTHORS.AUTHOR_ID))
+      .where(BOOKS.ID.eq(bookId))
+      .fetchGroups(BOOKS.ID)
+
+    val book = result.mapNotNull { (bookId, records) ->
+      val bookRecord = records.firstOrNull() ?: return@mapNotNull null
+      val authorsList = records.map { record ->
+        AuthorResponseDto(
+          record.getValue(AUTHORS.ID),
+          record.getValue(AUTHORS.NAME),
+          record.getValue(AUTHORS.BIRTH_DATE)
+        )
+      }
+      BookResponseDto(
+        bookId,
+        bookRecord.getValue(BOOKS.TITLE),
+        bookRecord.getValue(BOOKS.PRICE),
+        bookRecord.getValue(BOOKS.PUBLISH_STATUS),
+        PublishStatus.toValue(bookRecord.getValue(BOOKS.PUBLISH_STATUS)),
+        authorsList
+      )
+    }.firstOrNull() ?: throw NoSuchElementException("Book not found for ID: $bookId")
+
+    return book
+  }
+
+  /**
    * 書籍が存在するか確認するメソッド
    */
   fun existsByBookId(bookId: Int): Boolean {
