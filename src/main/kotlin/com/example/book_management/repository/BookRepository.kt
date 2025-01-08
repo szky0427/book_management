@@ -23,6 +23,7 @@ class BookRepository(private val create: DSLContext) {
       .from(BOOK_AUTHORS)
       .join(AUTHORS).on(AUTHORS.ID.eq(BOOK_AUTHORS.AUTHOR_ID))
       .where(authorName?.let { AUTHORS.NAME.likeIgnoreCase("%$it%") } ?: trueCondition())
+    // エルビス演算子?:によりnull出ない場合はその値を返しnullの場合はtrueCondition()を返す
 
     val query = create
       .select(

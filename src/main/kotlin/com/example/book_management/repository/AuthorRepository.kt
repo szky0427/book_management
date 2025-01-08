@@ -1,8 +1,9 @@
 package com.example.book_management.repository
 
 import com.example.book_management.dto.response.AuthorResponseDto
-import jooq.Tables.AUTHORS
+import jooq.Tables.*
 import org.jooq.DSLContext
+import org.jooq.impl.DSL.trueCondition
 import org.springframework.stereotype.Repository
 import java.time.LocalDate
 
@@ -59,6 +60,50 @@ class AuthorRepository(private val create: DSLContext) {
         id = record.get(AUTHORS.ID),
         name = record.get(AUTHORS.NAME),
         birthDate = record.get(AUTHORS.BIRTH_DATE)
+      )
+    }
+  }
+
+  fun findAuthors(name: String?, authorId: Int?, birthDate: LocalDate?): List<AuthorResponseDto> {
+    val result = create
+      .select(AUTHORS.ID, AUTHORS.NAME, AUTHORS.BIRTH_DATE)
+      .from(AUTHORS)
+      .where(name?.let { AUTHORS.NAME.likeIgnoreCase("%$it%") } ?: trueCondition())
+        .and(authorId?.let { AUTHORS.ID.eq(it) } ?: trueCondition())
+        .and(birthDate?.let { AUTHORS.BIRTH_DATE.eq(it) } ?: trueCondition())
+      .orderBy(AUTHORS.ID)
+      .fetch()
+
+    // 取得件数0の時、空のListを返却する
+    if (result.isEmpty()) return emptyList()
+
+    return result.map { record ->
+      AuthorResponseDto(
+        id = record.get(AUTHORS.ID),
+        name = record.get(AUTHORS.NAME),
+        birthDate = record.get(AUTHORS.BIRTH_DATE)
+      )
+    }
+  }
+
+  /**
+   * 著者IDに紐づく著者を取得するメソッド
+   */
+  fun findAuthorById(authorId: Int): AuthorResponseDto? {
+    val result = create.select(
+      AUTHORS.ID,
+      AUTHORS.NAME,
+      AUTHORS.BIRTH_DATE
+    )
+      .from(AUTHORS)
+      .where(AUTHORS.ID.eq(authorId))
+      .fetchOne()
+
+    return result?.let {
+      AuthorResponseDto(
+        id = result.get(AUTHORS.ID),
+        name = result.get(AUTHORS.NAME),
+        birthDate = result.get(AUTHORS.BIRTH_DATE)
       )
     }
   }

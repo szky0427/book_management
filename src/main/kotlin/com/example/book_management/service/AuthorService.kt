@@ -1,6 +1,7 @@
 package com.example.book_management.service
 
 import com.example.book_management.dto.request.AuthorRequestDto
+import com.example.book_management.dto.response.AuthorResponseDto
 import com.example.book_management.repository.AuthorRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -29,6 +30,20 @@ class AuthorService(private val authorRepository: AuthorRepository) {
     if (!isBeforeToday(authorRequestDto.birthDate)) throw IllegalArgumentException("生年月日は現在の日付より過去である必要があります。")
 
     authorRepository.updateAuthor(authorId, authorRequestDto.name, authorRequestDto.birthDate)
+  }
+
+  /**
+   * 検索条件に当てはまる著者情報を取得する
+   */
+  fun findAuthors(name: String?, authorId: Int?, birthDate: LocalDate?): List<AuthorResponseDto> {
+    return authorRepository.findAuthors(name, authorId, birthDate)
+  }
+
+  /**
+   * 著者IDに紐づく書籍情報を取得する
+   */
+  fun findAuthorByAuthorId(authorId: Int): AuthorResponseDto? {
+    return authorRepository.findAuthorById(authorId)
   }
 
   /**
